@@ -26,7 +26,7 @@ func GetProducerClient(version string) PublisherInterface {
 func (client *Client) Produce(msg []byte, topic string) error {
 	producerError := client.producer.Produce(createMessage(msg, topic), nil)
 	if producerError != nil {
-		fmt.Println("Failed to publish event")
+		fmt.Println("Failed to publish event " + producerError.Error())
 		panic(producerError)
 	}
 	event := <-client.producer.Events()
