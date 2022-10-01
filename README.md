@@ -13,7 +13,6 @@ change in the class of that object.
 
 ```mermaid
 classDiagram
-Client --|> Context
 Context --|> Strategy
 Context : InitStrategy()
 Context : Execute()

@@ -1,7 +1,6 @@
 package kafkaclient
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -28,7 +27,5 @@ func GetKafkConfigByVersion(version string) kafka.ConfigMap {
 			"bootstrap.servers": os.Getenv("KAFKA_BROKERS"),
 		},
 	}
-	fmt.Println("Kafka brokers: " + os.Getenv("KAFKA_BROKERS"))
-	fmt.Println("Kafka brokers SSL: " + os.Getenv("KAFKA_BROKERS_SSL"))
 	return connections[version]
 }

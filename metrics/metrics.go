@@ -1,8 +1,8 @@
 package metrics
 
 import (
-	"fmt"
 	"net/http"
+	"strategy-fulfillment-flow/logger"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -13,6 +13,7 @@ type CounterInterface interface {
 	WithLabelValues(lvs ...string) prometheus.Counter
 }
 
+var log = logger.NewLogger()
 var metrics = make(map[string]CounterInterface)
 var serverListen = http.ListenAndServe
 var newCounter = prometheus.NewCounterVec
@@ -39,7 +40,7 @@ func createCounterVec(name string, help string) CounterInterface {
 	var counter = newCounter(options, []string{"topic", "error"})
 
 	if err := register(counter); err != nil {
-		fmt.Println("Register metrics error")
+		log.Error("Register metrics error", logger.Parameters{Error: err.Error()})
 	}
 
 	return counter

@@ -20,8 +20,11 @@ func NewLogger() Logger {
 
 // Parameters struct
 type Parameters struct {
-	Level string `json:"level,omitempty"`
-	Error string `json:"error,omitempty"`
+	Level                string `json:"level,omitempty"`
+	Error                string `json:"error,omitempty"`
+	Input_queue_version  string `json:"input_queue_version,omitempty"`
+	Output_queue_version string `json:"output_queue_version,omitempty"`
+	Input_topic          string `json:"input_topic,omitempty"`
 }
 
 type parametersKeyValue map[string]string
