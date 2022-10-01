@@ -17,8 +17,8 @@ Context --|> Strategy
 Context : InitStrategy()
 Context : Execute()
 Strategy : BusinessAdaptersExecute()
-ReceiveOrder --> Strategy
-ReceiveOrder : BusinessAdaptersExecute()
-PickingFinalized --> Strategy
-PickingFinalized : BusinessAdaptersExecute()
+ReceiveOrderStrategy --> Strategy
+ReceiveOrderStrategy : BusinessAdaptersExecute()
+PickingFinalizedStrategy --> Strategy
+PickingFinalizedStrategy : BusinessAdaptersExecute()
 ```
