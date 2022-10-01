@@ -10,14 +10,21 @@ import (
 
 var log = logger.NewLogger()
 
-func (flow *flow) ExecuteFlow(eventMetrics map[string]metrics.CounterInterface) {
+func InitStrategy(s Strategy, input_queue_version string, output_queue_version string, input_topic string) *strategy {
+	return &strategy{
+		Strategy:             s,
+		input_queue_version:  input_queue_version,
+		output_queue_version: output_queue_version,
+		input_topic:          input_topic,
+	}
+}
 
-	config := flow.FlowProcess.SetConfig()
-	producer := getProducer(config["queue_output_version"])
-
-	var consumerInterface consumer.ConsumerInterface = consumer.GetConsumerClient(config["queue_input_version"], config["input_topic"])
+func (s *strategy) Execute(eventMetrics map[string]metrics.CounterInterface) {
+	var producer publisher.PublisherInterface = publisher.GetProducerClient(s.output_queue_version)
+	var consumerInterface consumer.ConsumerInterface = consumer.GetConsumerClient(s.input_queue_version, s.input_topic)
 	consumer := consumerInterface.SuscribeTopic(context.Background())
 	defer consumer.Close()
+
 	for {
 		message, errorConsume := consumer.ReadMessage(-1)
 		if errorConsume != nil {
@@ -36,15 +43,10 @@ func (flow *flow) ExecuteFlow(eventMetrics map[string]metrics.CounterInterface) 
 			metrics.Inc(eventMetrics["process"], *message.TopicPartition.Topic, "")
 		}
 
-		output_message, output_topic, err := flow.FlowProcess.BusinessAdaptersExecute(message.Value)
+		output_message, output_topic, err := s.Strategy.BusinessAdaptersExecute(message.Value)
 		if err != nil {
 			producer.Produce(output_message, output_topic)
 			metrics.Inc(eventMetrics["publish"], output_topic, "")
 		}
 	}
-}
-
-func getProducer(version string) publisher.PublisherInterface {
-	var publisherInterface publisher.PublisherInterface = publisher.GetProducerClient(version)
-	return publisherInterface
 }
