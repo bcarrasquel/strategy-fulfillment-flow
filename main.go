@@ -1,26 +1,32 @@
 package main
 
 import (
-	kafkaclient "strategy-fulfillment-flow/infrastructure/queue/kafka"
+	"fmt"
+	"os"
 	"strategy-fulfillment-flow/metrics"
 	"strategy-fulfillment-flow/strategy"
 )
 
+var execute_strategy strategy.Strategy
+
 func main() {
+
+	switch os.Getenv("STRATEGY") {
+	case "RECEIVE_ORDERS":
+		execute_strategy = strategy.ReceptionOrderStrategy{}
+	case "PICKING_FINALIZED":
+		execute_strategy = strategy.ReceptionOrderStrategy{}
+	default:
+		fmt.Println("STRATEGY DOES NO DEFINED")
+		panic(1)
+	}
+
 	eventMetrics := metrics.InitMetrics()
-
 	go strategy.InitStrategy(
-		strategy.ReceptionOrderStrategy{},
-		kafkaclient.KAFKA_VERSION_2_8,
-		kafkaclient.KAFKA_VERSION_2_8,
-		"create_order_input_topic",
-		eventMetrics).Execute()
-
-	go strategy.InitStrategy(
-		strategy.PickingFinalizedStrategy{},
-		kafkaclient.KAFKA_VERSION_2_8,
-		kafkaclient.KAFKA_VERSION_2_8,
-		"picking_finalized_input_topic",
+		execute_strategy,
+		os.Getenv("INPUT_QUEUE_VERSION"),
+		os.Getenv("OUTPUT_QUEUE_VERSION"),
+		os.Getenv("INPUT_TOPIC"),
 		eventMetrics).Execute()
 
 	metrics.Expose()

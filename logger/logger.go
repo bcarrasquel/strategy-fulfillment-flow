@@ -2,6 +2,7 @@ package logger
 
 import (
 	"encoding/json"
+	"os"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -22,6 +23,7 @@ func NewLogger() Logger {
 type Parameters struct {
 	Level                string `json:"level,omitempty"`
 	Error                string `json:"error,omitempty"`
+	Strategy             string `json:"strategy,omitempty"`
 	Input_queue_version  string `json:"input_queue_version,omitempty"`
 	Output_queue_version string `json:"output_queue_version,omitempty"`
 	Input_topic          string `json:"input_topic,omitempty"`
@@ -48,6 +50,7 @@ func (logger *Logger) withFields(parameters parametersKeyValue) {
 func (logger *Logger) Info(message string, parameters Parameters) {
 	logger.restore()
 	parameters.Level = infoLevel
+	parameters.Strategy = os.Getenv("STRATEGY")
 	logger.withFields(convertParametersToKeyValue(parameters))
 	logger.log.Info(message)
 }
@@ -56,6 +59,7 @@ func (logger *Logger) Info(message string, parameters Parameters) {
 func (logger *Logger) Error(message string, parameters Parameters) {
 	logger.restore()
 	parameters.Level = errorLevel
+	parameters.Strategy = os.Getenv("STRATEGY")
 	logger.withFields(convertParametersToKeyValue(parameters))
 	logger.log.Error(message)
 }
